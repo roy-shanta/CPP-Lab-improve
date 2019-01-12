@@ -1,0 +1,239 @@
+#include<bits/stdc++.h>
+
+using namespace std;
+
+class BookStore;
+
+class Person
+{
+        string name, dob;
+    public:
+        Person(){}
+        Person(string n, string d)
+        {
+            name = n;
+            dob = d;
+        }
+        void outPerson()
+        {
+            cout<<"Name: "<<name<<endl;
+            cout<<"Date of birth: "<<dob<<endl;
+        }
+};
+
+class Book
+{
+        string bookName, writerName, category;
+        double price;
+        int quantity = 0;
+    public:
+        Book(){}
+        Book(string n, string m, string p, double x, int s)
+        {
+            bookName = n;
+            writerName = m;
+            category = p;
+            price = x;
+            quantity += s;
+        }
+        void printBook()
+        {
+            cout<<"Book name: "<<bookName<<endl;
+            cout<<"Writer name: "<<writerName<<endl;
+            cout<<"Price: "<<price<<endl;
+            cout<<"Category: "<<category<<endl;
+            cout<<"Quantity: "<<quantity<<endl;
+        }
+        double getPrice(int x)
+        {
+            return price;
+        }
+        double getQuantity(int x)
+        {
+            return quantity;
+        }
+        void setQuantity(int x)
+        {
+            quantity += x;
+        }
+        friend double selectBook( BookStore stor );
+};
+
+class Customer : public Person
+{
+        double payment = 0;
+        int count = 0;
+        string customer_no;
+        vector<int> bookno;
+    public:
+        Customer(){}
+        Customer(string n,string d, string s): Person(n,d)
+        {
+            customer_no = s;
+        }
+        double getPayment()
+        {
+            return payment;
+        }
+        string getID()
+        {
+            return customer_no;
+        }
+        void outCustomer()
+        {
+            cout<<"Customer No: "<<customer_no<<endl;
+            outPerson();
+            cout<<"Payment: "<<payment<<endl;
+        }
+        void clearPayment()
+        {
+            payment = 0;
+        }
+        void setPayment(double x)
+        {
+            payment += x;
+        }
+};
+
+
+class BookStore
+{
+        vector<Customer> css;
+        vector<Book> bk;
+    public:
+        int checkCustomer(string ss)
+        {
+            bool fg = 0;
+            int i;
+            for(i = 0; i < css.size(); i++)
+            {
+                if(css[i].getID()==ss)
+                {
+                    fg = 1;
+                    break;
+                }
+            }
+            if(fg) return i;
+            return -1;
+        }
+        friend double selectBook(BookStore stor);
+        void getCustomer(Customer cc)
+        {
+            css.push_back(cc);
+        }
+        void setPayment(int i, double x)
+        {
+            css[i].setPayment(x);
+        }
+        void getBook(Book cc)
+        {
+            bk.push_back(cc);
+        }
+        Customer getCustomer(int i)
+        {
+            return css[i];
+        }
+        void clearCustomer(int i)
+        {
+            css[i].clearPayment();
+        }
+};
+
+double selectBook( BookStore stor )
+{
+    double pp = 0;
+    for(int i = 0; i < stor.bk.size(); i++)
+    {
+        int x;
+        stor.bk[i].printBook();
+        cout<<"Enter 1 to buy book, 0 to ignor: ";
+        cin>>x;
+        if(x==1) pp += stor.bk[i].price;
+    }
+    return pp;
+}
+
+int main()
+{
+    int x;
+    BookStore bookStore;
+    while(1)
+    {
+        cout<<"Enter 1 to input Customer in book store, Enter 2 to input Book into book store, Enter 3 to buy books, Enter 4 to see customer data, Enter 5 to clear payment, 0 to exit: ";
+        cin>>x;
+        if(x==0) break;
+        if(x==1)
+        {
+            string a,b,c;
+            cout<<"Enter Customer Name: ";
+            cin>>a;
+            cout<<"Enter Customer Date of birth: ";
+            cin>>b;
+            cout<<"Enter Customer ID: ";
+            cin>>c;
+            Customer cus(a,b,c);
+            bookStore.getCustomer(cus);
+        }
+        if(x==2)
+        {
+            string a,b,c;
+            double m; int n;
+            cout<<"Enter book Name: ";
+            cin>>a;
+            cout<<"Enter writer name: ";
+            cin>>b;
+            cout<<"Enter Category: ";
+            cin>>c;
+            cout<<"Enter Price: ";
+            cin>>m;
+            cout<<"Enter quantity: ";
+            cin>>n;
+            bookStore.getBook(Book(a,b,c,m,n));
+        }
+        if(x==3)
+        {
+            string str;
+            cout<<"Enter customer no: ";
+            cin>>str;
+            int i = bookStore.checkCustomer(str);
+            if(i!=-1)
+            {
+                double pay = selectBook(bookStore);
+                bookStore.setPayment(i, pay);
+            }
+            else cout<<"No such user"<<endl;
+        }
+        if(x==4)
+        {
+            string str;
+            cout<<"Please enter your ID: ";
+            cin>>str;
+            int i = bookStore.checkCustomer(str);
+            if(i!=-1)
+            {
+                Customer c = bookStore.getCustomer(i);
+            }
+            else cout<<"No such user"<<endl;
+        }
+        if(x==5)
+        {
+            string str;
+            cout<<"Please enter your ID: ";
+            cin>>str;
+            int i = bookStore.checkCustomer(str);
+            if(i!=-1)
+            {
+                Customer c = bookStore.getCustomer(i);
+                cout<<"Please pay "<<c.getPayment()*.95<<" Taka(5%% discount): ";
+                double m;
+                cin>>m;
+                if((c.getPayment()*.95)==m)
+                {
+                    bookStore.clearCustomer(i);
+                }
+            }
+            else cout<<"No such user"<<endl;
+        }
+    }
+    return 0;
+}
